@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+    <title>ADVENTS | Staff Me If You Can</title>
+    <meta name="description" content="Staff Me If You Can - Web app to find makers or things to make">
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-title" content="Staff Me">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script type="text/javascript" data-app-id="i7UkJldCuadzjTW5I7dgPw" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
+</head>
+
+<body>
+    <div id="loading" style="display:block;">Chargement...</div>
+    <div id="unauth" style="display:none;">
+      <h1>Staff Me : Tu n'es pas connecté à l'appli</h1>
+      <a id="yammer-login" href="">Connecte-toi avec Yammer !!!</a>
+    </div>    
+    <div id="auth" style="display:none;">
+      <h1>Staff Me : Tu es connecté à l'appli !</h1>
+      <p><img src="" id="yammer-img"/><span id="yammer-identity"></span></p>
+      <ul id="yammer-users">
+        <li id="loading-users">Chargement des gens de mon réseau...</li>
+      </ul>
+      <a id="yammer-logout" href="#">Déconnecte-toi</a>
+    </div>
+    
+<ul>
+</ul>
+    <!--<iframe id="yammer-dialog" style="width:100%;"></iframe>/-->
+    <script>
+        var clientID = "i7UkJldCuadzjTW5I7dgPw"
+         // , clientSecret = "lORcS429MzDFP79XNAPEIWW8U7adrzZjS6Yro9ZWhw"
+          , redirectURI = "http://127.0.0.1/edsa-yammer/"
+          , baseURI = "https://www.yammer.com/"
+          , userAuthURI = baseURI+"dialog/oauth?client_id="+clientID+"&response_type=token&redirect_uri="+redirectURI
+
+				document.querySelector('#yammer-login').href = userAuthURI;
+        var messages, groups, users;
+				
+        yam.getLoginStatus(
+          function(response) {
+            if (response.authResponse) {
+              document.getElementById("loading").style.display = "none";
+              document.getElementById("unauth").style.display = "none";
+              document.getElementById("auth").style.display = "block";
+              //console.log(response);
+              document.getElementById("yammer-img").src = response.user.mugshot_url;
+              document.getElementById("yammer-identity").innerHTML = response.user.full_name;
+              yam.platform.request({
+                url: "messages.json",     //this is one of many REST endpoints that are available
+                method: "GET",
+                data: {    //use the data object literal to specify parameters, as documented in the REST API section of this developer site
+                  "limit": "10"
+                },
+                success: function (user) { //print message response information to the console
+                  var ul = document.getElementById("yammer-users");
+                  document.getElementById("loading-users").style.display = "none";
+                  user.messages.forEach(function(element){
+                    //var li = document.createElement("li");
+                    ////li.innerHTML = '<img src="'+element.mugshot_url+'" />'+element.full_name;
+                    //li.innerHTML = element.body.plain;
+                    //ul.appendChild(li);
+                    var msg = {
+                      client_type: element.client_type,
+                      created_at: element.created_at,
+                      group_id: element.group_id,
+                      id: element.id,
+                      liked_by: element.liked_by,
+                      body: element.body.plain,
+                      notified_user_ids: element.notified_user_ids,
+                      replied_to_id: element.replied_to_id,
+                      sender_id: element.sender_id,
+                      thread_id: element.thread_id
+                    };
+                    var tags = element.body.plain.split('#');
+                    msg.tags = tags;
+                    console.log(msg);
+                  });
+                },
+                error: function (users) {
+                  document.getElementById("loading-users").innerHTML = "Erreur...";
+                }
+              });
+            }
+            else {
+              document.getElementById("loading").style.display = "none";
+              document.getElementById("unauth").style.display = "block";
+              document.getElementById("auth").style.display = "none";
+              //console.log('else');
+              //alert('else');
+              //document.getElementById("yammer-dialog").src = userAuthURI;
+              //document.getElementById("yammer-login").onclick = function(event){
+              //  event.preventDefault();
+              //  window.location = userAuthURI;
+              //};
+            }
+          }
+        );
+        document.getElementById("yammer-logout").onclick = function(){
+          yam.getLoginStatus(
+            function(response) {
+              if(response.authResponse) {
+                yam.platform.logout(function (response) {
+                  //console.log("user was logged out");
+                  document.getElementById("unauth").style.display = "block";
+                  document.getElementById("auth").style.display = "none";
+                  document.getElementById("yammer-users").innerHTML = "";
+                  document.getElementById("yammer-img").src = "";
+                  document.getElementById("yammer-identity").innerHTML = "";
+                })
+              }
+            }
+          );
+        }
+
+ //      var a=document.getElementsByTagName("a");
+ //      for(var i=0;i<a.length;i++){
+ //        a[i].onclick=function(){
+ //            window.location = userAuthURI;
+ //            return false;
+ //        }
+ //      }
+
+        
+				// Mobile Safari in standalone mode
+				if(("standalone" in window.navigator) && window.navigator.standalone){
+					
+						// If you want to prevent remote links in standalone web apps opening Mobile Safari, change 'remotes' to true
+						var noddy, remotes = true;
+						
+						document.addEventListener('click', function(event) {
+							
+							noddy = event.target;
+							
+							// Bubble up until we hit link or top HTML element. Warning: BODY element is not compulsory so better to stop on HTML
+							while(noddy.nodeName !== "A" && noddy.nodeName !== "HTML") {
+										noddy = noddy.parentNode;
+								}
+							
+							if('href' in noddy && noddy.href.indexOf('http') !== -1 && (noddy.href.indexOf(document.location.host) !== -1 || remotes))
+							{
+								event.preventDefault();
+								document.location.href = noddy.href;
+							}
+						
+						},false);
+					}
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Yammer Connection Demo</title>
+    <!--<script type="text/javascript" data-app-id="tIlnDsrNcuQkac5Pzvf0Tg" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
+    <script type="text/javascript" data-app-id="tIlnDsrNcuQkac5Pzvf0Tg" src="yammer.js"></script>!-->
+</head>
+
+<body>
+    <span id="yammer-login">coucou</span>
+    <iframe name="yammer-login" src=""></iframe>
+    <script>
+        //yam.connect.loginButton('#yammer-login', function (resp) {
+        //    if (resp.authResponse) {
+        //        document.getElementById('yammer-login').innerHTML = 'Welcome to Yammer!';
+        //    }
+        //});
+        // DEV TOKEN : 317340-AUJstme2W41suiyeoj91YA
+        // CLIENT ID :  tIlnDsrNcuQkac5Pzvf0Tg
+        var clientID = "tIlnDsrNcuQkac5Pzvf0Tg", redirectURI = "https://staffme-ed5a4.firebaseapp.com/";
+        // CLIENT SECRET :  lORcS429MzDFP79XNAPEIWW8U7adrzZjS6Yro9ZWhw
+        document.getElementsByName("yammer-login").src = "https://www.yammer.com/oauth2/authorize?client_id="+clientID+"&response_type=code&redirect_uri="+redirectURI;
+        console.log(document.getElementsByName("yammer-login").src);
+    </script>
+</body>
+</html>
